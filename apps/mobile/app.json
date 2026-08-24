@@ -1,0 +1,1 @@
+{"expo":{"name":"Easy Food","slug":"easy-food","version":"0.1.0","orientation":"portrait","scheme":"easyfood","userInterfaceStyle":"light","plugins":["expo-router"],"ios":{"supportsTablet":true,"bundleIdentifier":"pk.easyfood.app"},"android":{"package":"pk.easyfood.app"}}}
