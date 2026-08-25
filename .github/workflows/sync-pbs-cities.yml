@@ -20,7 +20,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y poppler-utils
 
       - name: Download official PBS Census 2023 Table 2
-        run: curl -L --fail --retry 3 -o /tmp/table2.pdf https://www.pbos.gov.pk/wp-content/uploads/census_tables/tables/table_2_national.pdf
+        run: curl -k -L --fail --retry 3 -o /tmp/table2.pdf https://www.pbos.gov.pk/wp-content/uploads/census_tables/tables/table_2_national.pdf
 
       - name: Extract official locality names and update Easy Food
         run: |
