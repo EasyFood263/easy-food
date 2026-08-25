@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 const OWNER_EMAIL = 'bukharaofficial321@gmail.com';
 
@@ -21,6 +21,7 @@ export default function AdminSecurity() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [status, setStatus] = useState<Status>(null);
   const [busy, setBusy] = useState(false);
+  const allowNextClick = useRef(false);
 
   useEffect(() => {
     const onCapture = async (event: MouseEvent) => {
@@ -29,6 +30,11 @@ export default function AdminSecurity() {
       if (!button) return;
       const text = (button.textContent || '').trim();
       if (text !== 'Continue securely') return;
+
+      if (allowNextClick.current) {
+        allowNextClick.current = false;
+        return;
+      }
 
       const modal = button.closest('.login');
       if (!modal || !(modal.textContent || '').includes('Admin Control Centre')) return;
@@ -65,14 +71,11 @@ export default function AdminSecurity() {
           return;
         }
 
-        // The existing UI expects the one-time-code field to be non-empty.
-        // The server remains the source of truth for whether a code is required.
         if (accessInput && !accessInput.value) setReactInputValue(accessInput, '0000');
+        allowNextClick.current = true;
         setAdminSession(true);
         setStatus({ kind: 'ok', text: 'Owner verified. Opening the private control centre…' });
-        setTimeout(() => {
-          button.click();
-        }, 0);
+        setTimeout(() => button.click(), 0);
       } catch {
         setStatus({ kind: 'error', text: 'Could not reach the secure authentication service.' });
       }
@@ -112,16 +115,8 @@ export default function AdminSecurity() {
   }
 
   return <>
-    {adminSession && <button
-      type="button"
-      onClick={() => { setStatus(null); setChangeOpen(true); }}
-      style={{ position: 'fixed', right: 22, top: 88, zIndex: 210, border: '1px solid #dce4ee', background: '#fff', color: '#10213e', borderRadius: 10, padding: '10px 14px', fontWeight: 800, boxShadow: '0 8px 25px #10213e20' }}
-    >🔐 Change password</button>}
-
-    {status && <div style={{ position: 'fixed', right: 22, bottom: 22, zIndex: 220, maxWidth: 420, padding: '13px 16px', borderRadius: 11, background: status.kind === 'ok' ? '#0b6b4b' : '#9f234e', color: '#fff', fontSize: 12, boxShadow: '0 12px 35px #0003' }}>
-      {status.text}
-    </div>}
-
+    {adminSession && <button type="button" onClick={() => { setStatus(null); setChangeOpen(true); }} style={{ position: 'fixed', right: 22, top: 88, zIndex: 210, border: '1px solid #dce4ee', background: '#fff', color: '#10213e', borderRadius: 10, padding: '10px 14px', fontWeight: 800, boxShadow: '0 8px 25px #10213e20' }}>🔐 Change password</button>}
+    {status && <div style={{ position: 'fixed', right: 22, bottom: 22, zIndex: 220, maxWidth: 420, padding: '13px 16px', borderRadius: 11, background: status.kind === 'ok' ? '#0b6b4b' : '#9f234e', color: '#fff', fontSize: 12, boxShadow: '0 12px 35px #0003' }}>{status.text}</div>}
     {changeOpen && <div style={{ position: 'fixed', inset: 0, zIndex: 230, background: '#061328a6', backdropFilter: 'blur(5px)', display: 'grid', placeItems: 'center', padding: 18 }}>
       <div style={{ width: 'min(480px, 94vw)', background: '#fff', borderRadius: 22, padding: 30, boxShadow: '0 25px 80px #0005', position: 'relative' }}>
         <button type="button" onClick={() => setChangeOpen(false)} style={{ position: 'absolute', right: 16, top: 16, border: 0, background: '#f0f4f8', borderRadius: 9, width: 36, height: 36, fontSize: 22 }}>×</button>
