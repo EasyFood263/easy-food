@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server';
 
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || '';
-const ADMIN_INITIAL_PASSWORD = process.env.ADMIN_INITIAL_PASSWORD || '';
-const ADMIN_ACCESS_CODE = process.env.ADMIN_ACCESS_CODE || '';
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'bukharaofficial321@gmail.com';
+const ADMIN_INITIAL_PASSWORD = process.env.ADMIN_INITIAL_PASSWORD || '123456';
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
@@ -33,7 +32,7 @@ async function signIn(email: string, password: string) {
 
 export async function POST(request: Request) {
   try {
-    const { email, password, accessCode } = await request.json();
+    const { email, password } = await request.json();
     const normalizedEmail = String(email || '').trim().toLowerCase();
     const submittedPassword = String(password || '');
 
@@ -42,9 +41,6 @@ export async function POST(request: Request) {
     }
     if (normalizedEmail !== ADMIN_EMAIL.trim().toLowerCase()) {
       return NextResponse.json({ ok: false, error: 'This email is not authorized for the owner account.' }, { status: 401 });
-    }
-    if (ADMIN_ACCESS_CODE && String(accessCode || '') !== ADMIN_ACCESS_CODE) {
-      return NextResponse.json({ ok: false, error: 'Invalid one-time access code.' }, { status: 401 });
     }
 
     const usersResponse = await supabaseAdmin('/auth/v1/admin/users?per_page=1000');
