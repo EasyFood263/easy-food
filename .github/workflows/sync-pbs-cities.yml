@@ -16,9 +16,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Apply Easy Food admin auth cleanup
-        run: python scripts/fix-admin-auth.py
-
       - name: Install PDF tools
         run: sudo apt-get update && sudo apt-get install -y poppler-utils
 
@@ -30,10 +27,10 @@ jobs:
           pdftotext -layout /tmp/table2.pdf /tmp/pbs-table2.txt
           python scripts/sync-pbs-cities.py
 
-      - name: Commit generated city selector and auth cleanup
+      - name: Commit generated city selector
         run: |
           git config user.name "easy-food-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add app/page.tsx app/pakistan-cities.ts app/api/admin/login/route.ts app/api/admin/change-password/route.ts app/globals.css scripts/fix-admin-auth.py
-          git diff --cached --quiet || git commit -m "fix: secure admin access and use complete PBS 2023 city selector [skip ci]"
+          git add app/page.tsx app/pakistan-cities.ts
+          git diff --cached --quiet || git commit -m "fix: use complete PBS 2023 Pakistan city selector [skip ci]"
           git push
