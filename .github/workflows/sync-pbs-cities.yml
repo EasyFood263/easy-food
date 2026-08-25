@@ -1,0 +1,36 @@
+name: Sync Pakistan Census Cities
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install PDF tools
+        run: sudo apt-get update && sudo apt-get install -y poppler-utils
+
+      - name: Download official PBS Census 2023 Table 2
+        run: curl -L --fail --retry 3 -o /tmp/table2.pdf https://www.pbos.gov.pk/wp-content/uploads/census_tables/tables/table_2_national.pdf
+
+      - name: Extract official locality names and update Easy Food
+        run: |
+          pdftotext -layout /tmp/table2.pdf /tmp/pbs-table2.txt
+          python scripts/sync-pbs-cities.py
+
+      - name: Commit generated city selector
+        run: |
+          git config user.name "easy-food-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add app/page.tsx app/pakistan-cities.ts
+          git diff --cached --quiet || git commit -m "fix: use complete PBS 2023 Pakistan city selector [skip ci]"
+          git push
